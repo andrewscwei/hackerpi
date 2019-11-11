@@ -1,4 +1,13 @@
-# TL;DR
+## TL;DR
+
+```sh
+$ ./scan # Scan for all networks, take note of the BSSID and channel of the network you want to hack
+$ ./capture <bssid> <channel> # Begin capturing network activity and attempt to spoof a handshake
+$ ./kill # Stop all processes, this makes sure that all previously ran processes are killed in the background
+$ ./crack # Start cracking the network password
+```
+
+## Guide
 
 > See guide here: https://www.thepolyglotdeveloper.com/2018/06/crack-wireless-passwords-raspberry-pi-aircrack/
 
