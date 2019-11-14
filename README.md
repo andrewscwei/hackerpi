@@ -1,12 +1,64 @@
 # Raspberry Pi Hacking Unit
 
-## Common Commands
+## Setup
 
-- `startx`: Enter graphical mode
-- `shutdown now`: Shuts down the Raspberry Pi immediate
-- `reboot`: Reboots the Raspberry Pi
+## Flashing the SD Card
 
-## Changing Boot Sequence
+```sh
+$ diskutil list
+$ diskutil unmountDisk /dev/disk<disk# from diskutil>
+$ sudo dd bs=1m if=<path to .img> of=/dev/rdisk<disk# from diskutil> conv=sync
+```
+
+This process takes a while. While waiting, you can send a `SIGINFO` signal by pressing `Ctrl+T` to track the progress. After the image is copied over, you are done. You can insert the SD card to your Pi and boot it up.
+
+## Kali Linux
+
+> https://www.offensive-security.com/kali-linux-arm-images/#1493408272250-e17e9049-9ce8
+
+### Reconfigure SSH Keys
+
+```sh
+$ cd /etc/ssh/
+$ dpkg-reconfigure openssh-server
+$ update-rc.d -f ssh remove
+$ update-rc.d -f ssh defaults
+$ nano /etc/ssh/sshd_config
+
+# Uncomment `PermitRootLogin yes`
+
+$ service ssh restart
+$ update-rc.d -f ssh enable 2 3 4 5
+```
+
+### Automatic Login
+
+```sh
+$ nano /etc/lightdm/lightdm.conf
+
+# Set the following in the file.
+# autologin-user=root
+# autologin-user-timeout=0
+
+$ nano /etc/pam.d/lightdm-autologin
+# Comment out `auth      required pam_succeed_if.so user != root quiet_success`
+```
+
+```sh
+$ nano /etc/gdm3/daemon.conf
+
+# Uncomment the lines under `Enabling automatic login
+```
+
+### Fix Overscan
+
+```sh
+$ nano /boot/config.txt
+
+# Uncomment `disable_overscan=1`
+```
+
+### Change Boot Sequence
 
 Get the current session type:
 
@@ -25,6 +77,91 @@ To boot into text-mode:
 ```sh
 $ systemctl set-default multi-user.target
 ```
+
+## Ubuntu Server
+
+> https://ubuntu.com/download/iot/raspberry-pi
+
+### Configuring Onboard WiFi
+
+Update the system:
+
+```sh
+$ sudo apt update
+$ sudo apt full-upgrade
+$ sudo reboot
+```
+
+Determine interface names:
+
+```sh
+$ ip link show
+
+# 1: lo: <LOOPBACK,UP,LOWER_UP> …
+# 2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> … state UP …
+# 3: wlan0: <BROADCAST,MULTICAST> … state DOWN
+```
+
+Edit cloud-init config:
+
+```sh
+$ cd /etc/netplan
+$ sudo nano 50-cloud-init.yaml
+```
+
+Add WiFi access information to the cloud-init config YAML file:
+
+```yaml
+network:
+    version: 2
+    ethernets:
+        eth0:
+            optional: true
+            dhcp4: true
+    # add wifi setup information here ...
+    wifis:
+        wlan0:
+            optional: true
+            access-points:
+                "YOUR-SSID-NAME":
+                    password: "YOUR-NETWORK-PASSWORD"
+            dhcp4: true
+```
+
+## Change Hostname
+
+Get the hostname:
+
+```sh
+$ hostname
+```
+
+Change the hostname temporarily until next reboot:
+
+```sh
+$ sudo hostname <name>
+```
+
+Change the hostname permanently:
+
+```sh
+$ sudo nano /etc/hostname
+
+# Change the name in the file
+```
+
+## Allow Local Devices to Access Pi with Hostname
+
+Install `avahi` and `insserv`:
+
+```sh
+```
+
+## Common Commands
+
+- `startx`: Enter graphical mode
+- `shutdown now`: Shuts down the Raspberry Pi immediate
+- `reboot`: Reboots the Raspberry Pi
 
 ## Connecting to the Pi via SSH
 
