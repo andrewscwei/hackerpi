@@ -78,6 +78,15 @@ To boot into text-mode:
 $ systemctl set-default multi-user.target
 ```
 
+### Resize Partition
+
+```sh
+$ apt-get install gparted
+$ gparted
+
+# Select ext4 partition and click "Resize/Move", then move slider all the way to the right so that "Free spacie following (MiB):" is 0.
+```
+
 ## Ubuntu Server
 
 > https://ubuntu.com/download/iot/raspberry-pi
